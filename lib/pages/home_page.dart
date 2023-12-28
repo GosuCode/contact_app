@@ -10,6 +10,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController imageController = TextEditingController();
+  TextEditingController latitudeController = TextEditingController();
+  TextEditingController longitudeController = TextEditingController();
+
   List<ContactModel> contacts = [
     ContactModel(
         name: "Alu",
@@ -31,6 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
   @override
   Widget build(BuildContext context) {
+    double deviceWidth = MediaQuery.of(context).size.width;
+    double deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         // leading: Icon(Icons.calculate),
@@ -48,8 +56,45 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (_) => BottomSheet(
                         onClosing: () {},
                         builder: (_) => Container(
-                              height: 100,
-                              color: Colors.red,
+                              height: deviceHeight * 0.5,
+                              color: Colors.white54,
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'Add Contact',
+                                    style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 16),
+                                  Column(
+                                    children: [
+                                      TextFormField(
+                                        controller: nameController,
+                                        decoration:
+                                            InputDecoration(labelText: 'Name'),
+                                      ),
+                                      TextFormField(
+                                        controller: phoneController,
+                                        decoration: InputDecoration(
+                                            labelText: 'Phone Number'),
+                                      ),
+                                      TextFormField(
+                                        controller: imageController,
+                                        decoration: InputDecoration(
+                                            labelText: 'Image URL'),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    width: 25,
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {},
+                                    child: Text("Add Contact"),
+                                  )
+                                ],
+                              ),
                             )));
               },
               icon: Icon(
