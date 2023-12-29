@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,33 +20,34 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController latitudeController = TextEditingController();
   TextEditingController longitudeController = TextEditingController();
 
-  List<ContactModel> contacts = [
-    ContactModel(
-        name: "Alu",
-        phoneNumber: "9804406944",
-        image: "https://avatars.githubusercontent.com/u/104659592?v=4",
-        position: LatLngModel(latitude: 27.686386, longitude: 83.432426)),
-    ContactModel(
-        name: "Layla",
-        phoneNumber: "9867725022",
-        image:
-            "https://i.pinimg.com/originals/3a/c3/ed/3ac3edd7dc47205a016e7e2897c4b100.jpg",
-        position: LatLngModel(latitude: 52.25685, longitude: 83.432426)),
-    ContactModel(
-        name: "Noelle",
-        phoneNumber: "9804406944",
-        image:
-            "https://static1.thegamerimages.com/wordpress/wp-content/uploads/2020/12/Noelle-Upclose-Genshin_impact-Cropped.png",
-        position: LatLngModel(latitude: 27.686386, longitude: 99.6258)),
-  ];
+  clearField() {
+    image = null;
+    nameController.clear();
+    phoneController.clear();
+  }
+
+  selectAnImage(ImageSource source, Function(void Function()) setState) async {
+    Navigator.of(context).pop();
+    try {
+      XFile? pickedImage = await picker.pickImage(source: source);
+      // print(pickedImage!.path);
+      setState(() {
+        image = File(pickedImage!.path);
+      });
+    } catch (err) {
+      log(err.toString());
+    }
+  }
+
+  List<ContactModel> contacts = [];
 
   final ImagePicker picker = ImagePicker();
   File? image;
 
   @override
   Widget build(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width;
-    double deviceHeight = MediaQuery.of(context).size.height;
+    // double deviceWidth = MediaQuery.of(context).size.width;
+    // double deviceHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         // leading: Icon(Icons.calculate),
@@ -77,7 +79,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                   children: [
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [Icon(Icons.close)],
+                                      children: [
+                                        IconButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            icon: Icon(Icons.close))
+                                      ],
                                     ),
                                     Text(
                                       'Add Contact',
@@ -100,16 +108,44 @@ class _MyHomePageState extends State<MyHomePage> {
                                             child: image == null
                                                 ? IconButton(
                                                     onPressed: () async {
-                                                      XFile? pickedImage =
-                                                          await picker.pickImage(
-                                                              source:
-                                                                  ImageSource
-                                                                      .camera);
-                                                      print(pickedImage!.path);
-                                                      setState(() {
-                                                        image = File(
-                                                            pickedImage.path);
-                                                      });
+                                                      showDialog(
+                                                          context: context,
+                                                          builder:
+                                                              (_) =>
+                                                                  AlertDialog(
+                                                                    title: Text(
+                                                                        "Choose the Source"),
+                                                                    content: Text(
+                                                                        "Camera or Gallery"),
+                                                                    actions: [
+                                                                      TextButton
+                                                                          .icon(
+                                                                        onPressed:
+                                                                            () {
+                                                                          selectAnImage(
+                                                                              ImageSource.camera,
+                                                                              setState);
+                                                                        },
+                                                                        icon: Icon(
+                                                                            Icons.camera),
+                                                                        label: Text(
+                                                                            "Camera"),
+                                                                      ),
+                                                                      TextButton
+                                                                          .icon(
+                                                                        onPressed:
+                                                                            () {
+                                                                          selectAnImage(
+                                                                              ImageSource.gallery,
+                                                                              setState);
+                                                                        },
+                                                                        icon: Icon(
+                                                                            Icons.photo),
+                                                                        label: Text(
+                                                                            "Gallery"),
+                                                                      )
+                                                                    ],
+                                                                  ));
                                                     },
                                                     icon: Icon(
                                                       Icons.add_a_photo,
@@ -129,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 20),
                                           child: TextFormField(
-                                            controller: nameController,
+                                            controller: phoneController,
                                             keyboardType: TextInputType.phone,
                                             decoration: InputDecoration(
                                                 labelText: 'Phone Number'),
@@ -141,7 +177,19 @@ class _MyHomePageState extends State<MyHomePage> {
                                       height: 20,
                                     ),
                                     ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        this.setState(() {
+                                          contacts.add(ContactModel(
+                                              name: nameController.text,
+                                              phoneNumber: phoneController.text,
+                                              image: image,
+                                              position: LatLngModel(
+                                                  latitude: 12.2,
+                                                  longitude: 23.12)));
+                                        });
+                                        clearField();
+                                      },
                                       child: Text("Add Contact"),
                                     )
                                   ],
@@ -171,10 +219,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(50),
-                  child: Image.network(
-                    contacts[index].image,
-                    fit: BoxFit.fill,
-                  ),
+                  child: contacts[index].image == null
+                      ? Icon(Icons.person)
+                      : Image.file(
+                          contacts[index].image!,
+                          fit: BoxFit.fill,
+                        ),
                 ),
               ),
               title: Text(contacts[index].name),
