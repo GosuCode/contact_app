@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:new_contact/models/contact_model.dart';
 import 'package:new_contact/models/lat_long_model.dart';
 
@@ -35,6 +38,10 @@ class _MyHomePageState extends State<MyHomePage> {
             "https://static1.thegamerimages.com/wordpress/wp-content/uploads/2020/12/Noelle-Upclose-Genshin_impact-Cropped.png",
         position: LatLngModel(latitude: 27.686386, longitude: 99.6258)),
   ];
+
+  final ImagePicker picker = ImagePicker();
+  File? image;
+
   @override
   Widget build(BuildContext context) {
     double deviceWidth = MediaQuery.of(context).size.width;
@@ -52,50 +59,97 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 showModalBottomSheet(
                     // isDismissible: false,
+                    isScrollControlled: true,
                     context: context,
-                    builder: (_) => BottomSheet(
-                        onClosing: () {},
-                        builder: (_) => Container(
-                              height: deviceHeight * 0.5,
+                    builder: (_) =>
+                        StatefulBuilder(builder: (context, setState) {
+                          return Padding(
+                            padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom),
+                            child: Container(
+                              // height: deviceHeight * 0.5,
                               color: Colors.white54,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Add Contact',
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  SizedBox(height: 16),
-                                  Column(
-                                    children: [
-                                      TextFormField(
-                                        controller: nameController,
-                                        decoration:
-                                            InputDecoration(labelText: 'Name'),
-                                      ),
-                                      TextFormField(
-                                        controller: phoneController,
-                                        decoration: InputDecoration(
-                                            labelText: 'Phone Number'),
-                                      ),
-                                      TextFormField(
-                                        controller: imageController,
-                                        decoration: InputDecoration(
-                                            labelText: 'Image URL'),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: 25,
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {},
-                                    child: Text("Add Contact"),
-                                  )
-                                ],
+                              child: Padding(
+                                padding: const EdgeInsets.all(25.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [Icon(Icons.close)],
+                                    ),
+                                    Text(
+                                      'Add Contact',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Column(
+                                      children: [
+                                        Container(
+                                            height: 100,
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                border: Border.all(
+                                                    color: Colors.black,
+                                                    width: 2)),
+                                            child: image == null
+                                                ? IconButton(
+                                                    onPressed: () async {
+                                                      XFile? pickedImage =
+                                                          await picker.pickImage(
+                                                              source:
+                                                                  ImageSource
+                                                                      .camera);
+                                                      print(pickedImage!.path);
+                                                      setState(() {
+                                                        image = File(
+                                                            pickedImage.path);
+                                                      });
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.add_a_photo,
+                                                      size: 30,
+                                                    ))
+                                                : Image.file(image!)),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: TextFormField(
+                                            controller: nameController,
+                                            decoration: InputDecoration(
+                                                labelText: 'Full Name'),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: TextFormField(
+                                            controller: nameController,
+                                            keyboardType: TextInputType.phone,
+                                            decoration: InputDecoration(
+                                                labelText: 'Phone Number'),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {},
+                                      child: Text("Add Contact"),
+                                    )
+                                  ],
+                                ),
                               ),
-                            )));
+                            ),
+                          );
+                        }));
               },
               icon: Icon(
                 Icons.add,
