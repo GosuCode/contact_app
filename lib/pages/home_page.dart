@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:new_contact/models/contact_model.dart';
 import 'package:new_contact/models/lat_long_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -16,9 +17,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController imageController = TextEditingController();
-  TextEditingController latitudeController = TextEditingController();
-  TextEditingController longitudeController = TextEditingController();
 
   clearField() {
     image = null;
@@ -44,6 +42,14 @@ class _MyHomePageState extends State<MyHomePage> {
   final ImagePicker picker = ImagePicker();
   File? image;
 
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launchUrl(launchUri);
+  }
+
   @override
   Widget build(BuildContext context) {
     // double deviceWidth = MediaQuery.of(context).size.width;
@@ -52,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // leading: Icon(Icons.calculate),
         backgroundColor: Theme.of(context).primaryColor,
-        title: Text(
+        title: const Text(
           "Contacts",
           style: TextStyle(color: Colors.white, fontSize: 28),
         ),
@@ -87,13 +93,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                             icon: Icon(Icons.close))
                                       ],
                                     ),
-                                    Text(
+                                    const Text(
                                       'Add Contact',
                                       style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(height: 16),
+                                    const SizedBox(height: 16),
                                     Column(
                                       children: [
                                         Container(
@@ -113,10 +119,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           builder:
                                                               (_) =>
                                                                   AlertDialog(
-                                                                    title: Text(
+                                                                    title: const Text(
                                                                         "Choose the Source"),
-                                                                    content: Text(
-                                                                        "Camera or Gallery"),
+                                                                    content:
+                                                                        const Text(
+                                                                            "Camera or Gallery"),
                                                                     actions: [
                                                                       TextButton
                                                                           .icon(
@@ -126,9 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                               ImageSource.camera,
                                                                               setState);
                                                                         },
-                                                                        icon: Icon(
+                                                                        icon: const Icon(
                                                                             Icons.camera),
-                                                                        label: Text(
+                                                                        label: const Text(
                                                                             "Camera"),
                                                                       ),
                                                                       TextButton
@@ -139,30 +146,30 @@ class _MyHomePageState extends State<MyHomePage> {
                                                                               ImageSource.gallery,
                                                                               setState);
                                                                         },
-                                                                        icon: Icon(
+                                                                        icon: const Icon(
                                                                             Icons.photo),
-                                                                        label: Text(
+                                                                        label: const Text(
                                                                             "Gallery"),
                                                                       )
                                                                     ],
                                                                   ));
                                                     },
-                                                    icon: Icon(
+                                                    icon: const Icon(
                                                       Icons.add_a_photo,
                                                       size: 30,
                                                     ))
                                                 : Image.file(image!)),
                                         Padding(
-                                          padding: EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                               horizontal: 20),
                                           child: TextFormField(
                                             controller: nameController,
-                                            decoration: InputDecoration(
+                                            decoration: const InputDecoration(
                                                 labelText: 'Full Name'),
                                           ),
                                         ),
                                         Padding(
-                                          padding: EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                               horizontal: 20),
                                           child: TextFormField(
                                             controller: phoneController,
@@ -230,7 +237,9 @@ class _MyHomePageState extends State<MyHomePage> {
               title: Text(contacts[index].name),
               subtitle: Text(contacts[index].phoneNumber),
               trailing: IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  _makePhoneCall(contacts[index].phoneNumber);
+                },
                 icon: Icon(Icons.phone),
               ),
             );
