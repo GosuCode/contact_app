@@ -196,6 +196,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   longitude: 23.12)));
                                         });
                                         clearField();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                            "Contact added",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ));
                                       },
                                       child: Text("Add Contact"),
                                     )
